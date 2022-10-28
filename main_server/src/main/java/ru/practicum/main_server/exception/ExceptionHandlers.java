@@ -41,4 +41,15 @@ public class ExceptionHandlers {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleException(Throwable exception) {
+        return ApiError.builder()
+                .status(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR))
+                .reason("server's exception")
+                .message(exception.getLocalizedMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }
