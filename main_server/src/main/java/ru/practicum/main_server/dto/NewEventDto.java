@@ -16,11 +16,11 @@ import javax.validation.constraints.Size;
 public class NewEventDto {
 
     @NotNull
-    @Size(max = 1000)
+    @Size(min = 20, max = 2000)
     private String annotation;
     @NotNull
     private long category;
-    @Size(max = 1000)
+    @Size(min = 20, max = 7000)
     private String description;
     @NotNull
     @Size(max = 30)
@@ -33,6 +33,6 @@ public class NewEventDto {
     @Size(max = 20)
     private String state;
     @NotNull
-    @Size(max = 512)
+    @Size(min = 3, max = 120)
     private String title;
 }

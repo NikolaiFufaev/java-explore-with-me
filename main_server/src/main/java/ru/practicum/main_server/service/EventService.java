@@ -1,5 +1,8 @@
 package ru.practicum.main_server.service;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +23,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@EqualsAndHashCode
+@ToString
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class EventService {
     public static final int MIN_HOURS = 2;
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -34,19 +41,7 @@ public class EventService {
     private final HitClient hitClient;
     private final CategoryRepository categoryRepository;
     private final LocationService locationService;
-
-    public EventService(EventRepository eventRepository,
-                        ParticipationRepository participationRepository,
-                        HitClient hitClient, UserService userService,
-                        CategoryRepository categoryRepository,
-                        LocationService locationService) {
-        this.eventRepository = eventRepository;
-        this.participationRepository = participationRepository;
-        this.userService = userService;
-        this.hitClient = hitClient;
-        this.categoryRepository = categoryRepository;
-        this.locationService = locationService;
-    }
+    private final EventMapper eventMapper;
 
     public List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, String rangeStart,
                                          String rangeEnd, Boolean onlyAvailable, String sort, int from, int size) {
@@ -93,7 +88,7 @@ public class EventService {
     }
 
     public EventFullDto getEventById(long id) {
-        EventFullDto dto = EventMapper.toEventFullDto(checkAndGetEvent(id));
+        EventFullDto dto = eventMapper.toEventFullDto(checkAndGetEvent(id));
         if (!(dto.getState().equals(State.PUBLISHED.toString()))) {
             throw new WrongRequestException("Wrong state by request");
         }
@@ -147,7 +142,7 @@ public class EventService {
             event.setTitle(updateEventRequest.getTitle());
         }
         event = eventRepository.save(event);
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
@@ -157,7 +152,7 @@ public class EventService {
         log.info("before location save");
         location = locationService.save(location);
         log.info("location save");
-        Event event = EventMapper.toNewEvent(newEventDto);
+        Event event = eventMapper.toNewEvent(newEventDto);
         log.info("event {}", event);
         if (event.getEventDate().isBefore(LocalDateTime.now().minusHours(MIN_HOURS))) {
             throw new WrongRequestException("date event is too late");
@@ -169,7 +164,7 @@ public class EventService {
         event.setLocation(location);
 
         event = eventRepository.save(event);
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
@@ -178,7 +173,7 @@ public class EventService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new WrongRequestException("only initiator can get fullEventDto");
         }
-        return setConfirmedRequestsAndViewsEventFullDto(EventMapper.toEventFullDto(event));
+        return setConfirmedRequestsAndViewsEventFullDto(eventMapper.toEventFullDto(event));
     }
 
     @Transactional
@@ -192,7 +187,7 @@ public class EventService {
         }
         event.setState(State.CANCELED);
         event = eventRepository.save(event);
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
@@ -215,7 +210,7 @@ public class EventService {
         return eventRepository.searchEventsByAdmin(users, states, categories, start, end,
                         PageRequest.of(from / size, size))
                 .stream()
-                .map(EventMapper::toEventFullDto)
+                .map(eventMapper::toEventFullDto)
                 .map(this::setConfirmedRequestsAndViewsEventFullDto)
                 .collect(Collectors.toList());
     }
@@ -260,7 +255,7 @@ public class EventService {
             event.setTitle(adminUpdateEventRequest.getTitle());
         }
         event = eventRepository.save(event);
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
@@ -275,7 +270,7 @@ public class EventService {
         }
         event.setState(State.PUBLISHED);
         event = eventRepository.save(event);
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
@@ -285,7 +280,7 @@ public class EventService {
 
         event.setState(State.CANCELED);
         event = eventRepository.save(event);
-        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
@@ -318,9 +313,8 @@ public class EventService {
                 false);
 
         log.info("responseEntity {}", responseEntity.getBody());
-        if (responseEntity.getBody().equals("")) {
-            Integer hits = (Integer) ((LinkedHashMap) responseEntity.getBody()).get("hits");
-            return hits;
+        if (Objects.requireNonNull(responseEntity.getBody()).equals("")) {
+            return (Integer) ((LinkedHashMap<?, ?>) responseEntity.getBody()).get("hits");
         }
 
         return 0;

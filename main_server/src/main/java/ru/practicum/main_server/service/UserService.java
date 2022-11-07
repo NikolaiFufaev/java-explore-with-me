@@ -1,6 +1,6 @@
 package ru.practicum.main_server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +16,9 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
 
     public List<UserDto> getUsers(List<Long> ids, int from, int size) {
         if (ids.isEmpty()) {
@@ -51,5 +46,9 @@ public class UserService {
     public User checkAndGetUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException("user with id = " + userId + " not found"));
+    }
+
+    public User findById(Long id) {
+        return userRepository.findUserById(id);
     }
 }

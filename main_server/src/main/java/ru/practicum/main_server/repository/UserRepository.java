@@ -1,5 +1,6 @@
 package ru.practicum.main_server.repository;
 
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findAllByIdIn(List<Long> ids, Pageable pageable);
 
-    Page<User> findAll(Pageable pageable);
+    @NonNull Page<User> findAll(@NonNull Pageable pageable);
+
+    User findUserById(Long id);
 }

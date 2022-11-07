@@ -1,18 +1,20 @@
 package ru.practicum.main_server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "events")
@@ -23,7 +25,7 @@ public class Event {
 
     @Column(name = "annotation", nullable = false)
     @NotNull
-    @Size(max = 1000)
+    @Size(max = 2000)
     private String annotation;
 
     @ManyToOne
@@ -33,7 +35,7 @@ public class Event {
     private LocalDateTime createdOn;
 
     @Column(name = "description")
-    @Size(max = 1000)
+    @Size(max = 7000)
     private String description;
 
     @Column(name = "event_date", nullable = false)
@@ -42,7 +44,7 @@ public class Event {
     @ManyToOne
     private User initiator;
 
-    @ManyToOne()
+    @ManyToOne
     private Location location;
 
     @Column(name = "paid", nullable = false)
@@ -61,6 +63,20 @@ public class Event {
     private State state;
 
     @Column(name = "title", nullable = false)
-    @Size(max = 512)
+    @Size(max = 120)
     private String title;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Event event = (Event) o;
+        return id != null && Objects.equals(id, event.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
