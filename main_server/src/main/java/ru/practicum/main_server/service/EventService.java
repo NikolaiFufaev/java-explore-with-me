@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main_server.client.HitClient;
 import ru.practicum.main_server.dto.*;
 import ru.practicum.main_server.exception.ObjectNotFoundException;
+import ru.practicum.main_server.exception.RejectedRequestException;
 import ru.practicum.main_server.exception.WrongRequestException;
 import ru.practicum.main_server.mapper.EventMapper;
 import ru.practicum.main_server.model.*;
@@ -148,6 +149,9 @@ public class EventService {
 
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
+        if (newEventDto.getAnnotation() == null || newEventDto.getDescription() == null){
+            throw new RejectedRequestException("annotation or description cannot be null");
+        }
         Location location = newEventDto.getLocation();
         log.info("before location save");
         location = locationService.save(location);
@@ -312,7 +316,6 @@ public class EventService {
                 List.of("/events/" + eventId),
                 false);
 
-        log.info("responseEntity {}", responseEntity.getBody());
         if (Objects.requireNonNull(responseEntity.getBody()).equals("")) {
             return (Integer) ((LinkedHashMap<?, ?>) responseEntity.getBody()).get("hits");
         }

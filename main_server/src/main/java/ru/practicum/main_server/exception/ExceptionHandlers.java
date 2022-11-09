@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 public class ExceptionHandlers {
 
     @ExceptionHandler(ObjectNotFoundException.class)
-    public ApiError notFound(RuntimeException e) {
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError notFound(ObjectNotFoundException e) {
         return ApiError.builder()
-                .status(String.valueOf(HttpStatus.NOT_FOUND))
+                .status(HttpStatus.NOT_FOUND)
                 .reason("object not found")
                 .message(e.getLocalizedMessage())
                 .timestamp(LocalDateTime.now())
@@ -22,33 +23,34 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(WrongRequestException.class)
-    public ApiError forbidden(RuntimeException e) {
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError forbidden(WrongRequestException e) {
         return ApiError.builder()
-                .status(String.valueOf(HttpStatus.FORBIDDEN))
+                .status(HttpStatus.FORBIDDEN)
                 .reason("object not found")
                 .message(e.getLocalizedMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError notFoundInDb(RuntimeException e) {
+    @ExceptionHandler(ServerError.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleException(ServerError e) {
         return ApiError.builder()
-                .status(String.valueOf(HttpStatus.NOT_FOUND))
-                .reason("object not found in db")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .reason("server's exception")
                 .message(e.getLocalizedMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError handleException(Throwable exception) {
+    @ExceptionHandler(RejectedRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError badRequest(RejectedRequestException e) {
         return ApiError.builder()
-                .status(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR))
-                .reason("server's exception")
-                .message(exception.getLocalizedMessage())
+                .status(HttpStatus.BAD_REQUEST)
+                .reason("required values not found")
+                .message(e.getLocalizedMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
     }

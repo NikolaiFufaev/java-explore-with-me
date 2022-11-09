@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main_server.dto.NewUserRequest;
 import ru.practicum.main_server.dto.UserDto;
 import ru.practicum.main_server.exception.ObjectNotFoundException;
+import ru.practicum.main_server.exception.RejectedRequestException;
 import ru.practicum.main_server.mapper.UserMapper;
 import ru.practicum.main_server.model.User;
 import ru.practicum.main_server.repository.UserRepository;
@@ -35,6 +36,9 @@ public class UserService {
 
     @Transactional
     public UserDto saveUser(NewUserRequest newUserRequest) {
+        if(newUserRequest.getName()==null || newUserRequest.getEmail()==null){
+            throw new RejectedRequestException("user name and email must not be empty");
+        }
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(newUserRequest)));
     }
 

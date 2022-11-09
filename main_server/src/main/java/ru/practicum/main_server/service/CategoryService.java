@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main_server.dto.CategoryDto;
 import ru.practicum.main_server.dto.NewCategoryDto;
-import ru.practicum.main_server.exception.NoSuchElementException;
+import ru.practicum.main_server.exception.ObjectNotFoundException;
+import ru.practicum.main_server.exception.RejectedRequestException;
 import ru.practicum.main_server.mapper.CategoryMapper;
 import ru.practicum.main_server.model.Category;
 import ru.practicum.main_server.repository.CategoryRepository;
@@ -37,12 +38,15 @@ public class CategoryService {
                 .toCategoryDto(categoryRepository
                         .findById(id)
                         .orElseThrow(() ->
-                                new NoSuchElementException("Category not found")));
+                                new ObjectNotFoundException("Category not found")));
     }
 
     @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto) {
-        Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow();
+        if(categoryDto.getId() == null || categoryDto.getName().isEmpty()){
+            throw new RejectedRequestException("category id and name must not be null");}
+        Category category = categoryRepository.findById(categoryDto.getId()).orElseThrow(
+                ()-> new ObjectNotFoundException("category not found"));
         category.setName(categoryDto.getName());
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }
@@ -55,6 +59,9 @@ public class CategoryService {
 
     @Transactional
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
+        if(newCategoryDto.getName()==null){
+            throw new RejectedRequestException("category name must not be null");
+        }
         Category category = CategoryMapper.toCategoryFromNewCategoryDto(newCategoryDto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(category));
     }

@@ -7,6 +7,9 @@ import ru.practicum.main_server.dto.CommentDto;
 import ru.practicum.main_server.dto.UpdateComment;
 import ru.practicum.main_server.service.CommentService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+
 
 @RestController
 @RequestMapping(path = "/users/{userId}")
@@ -17,23 +20,23 @@ public class CommentPrivateController {
 
     @PostMapping("/events/{eventId}/comment")
     CommentDto createComment(@PathVariable Long userId,
-                             @PathVariable Long eventId,
-                             @RequestBody CommentDto commentDto) {
+                             @Positive @PathVariable Long eventId,
+                             @Valid @RequestBody CommentDto commentDto) {
         log.info("add comment by userId={} and eventId{}", userId, eventId);
         return commentService.createComment(userId, eventId, commentDto);
     }
 
     @DeleteMapping("/comment/{comId}")
-    void deleteComment(@PathVariable Long userId,
-                       @PathVariable Long comId) {
+    void deleteComment(@Positive  @PathVariable Long userId,
+                       @Positive @PathVariable Long comId) {
         log.info("delete comment by userId={} and comId{}", userId, comId);
         commentService.deleteComment(userId, comId);
     }
 
     @PatchMapping("/events/{eventId}/comment")
-    CommentDto updateComment(@PathVariable Long userId,
-                             @PathVariable Long eventId,
-                             @RequestBody UpdateComment updateComment) {
+    CommentDto updateComment(@Positive @PathVariable Long userId,
+                             @Positive @PathVariable Long eventId,
+                             @Valid @RequestBody UpdateComment updateComment) {
         log.info("update comment by userId={} and eventId{}", userId, eventId);
         return commentService.updateComment(userId, eventId, updateComment);
     }

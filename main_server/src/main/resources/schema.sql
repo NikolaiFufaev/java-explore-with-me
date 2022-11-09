@@ -5,7 +5,7 @@ drop table if exists categories CASCADE;
 drop table if exists compilation CASCADE;
 drop table if exists events CASCADE;
 drop table if exists compilations_events CASCADE;
-
+drop table if exists comments CASCADE;
 
 CREATE TABLE IF NOT EXISTS users
 (

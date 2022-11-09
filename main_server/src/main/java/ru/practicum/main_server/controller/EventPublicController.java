@@ -7,6 +7,7 @@ import ru.practicum.main_server.dto.EventShortDto;
 import ru.practicum.main_server.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
@@ -19,15 +20,15 @@ public class EventPublicController {
         this.eventService = eventService;
     }
 
-    @GetMapping()
+    @GetMapping
     public List<EventShortDto> getAllEvents(
             @RequestParam(required = false) String text,
-            @RequestParam List<Long> categories,
-            @RequestParam Boolean paid,
-            @RequestParam String rangeStart,
-            @RequestParam String rangeEnd,
-            @RequestParam Boolean onlyAvailable,
-            @RequestParam String sort,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false) Boolean paid,
+            @RequestParam(required = false) String rangeStart,
+            @RequestParam(required = false) String rangeEnd,
+            @RequestParam(defaultValue = "false") Boolean onlyAvailable,
+            @RequestParam(defaultValue = "EVENT_DATE") String sort,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request) {
@@ -46,7 +47,7 @@ public class EventPublicController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEventById(@PathVariable long id, HttpServletRequest request) {
+    public EventFullDto getEventById(@Positive @PathVariable long id, HttpServletRequest request) {
         log.info("get event id={}", id);
         eventService.sentHitStat(request.getRequestURI(), request.getRemoteAddr());
         return eventService.getEventById(id);

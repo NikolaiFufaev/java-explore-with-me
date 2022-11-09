@@ -85,4 +85,14 @@ public class CommentService {
 
     }
 
+    public List<CommentDto> getUserComments(long id) {
+        User user = userService.findById(id);
+
+        return commentRepository.findCommentsByAuthorOrderByCreated(user)
+                .stream()
+                .map(commentMapper::toCommentDto)
+                .collect(Collectors.toList());
+
+    }
+
 }
