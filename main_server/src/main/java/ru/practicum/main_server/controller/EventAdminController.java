@@ -27,7 +27,8 @@ public class EventAdminController {
                                            @RequestParam(required = false) String rangeStart,
                                            @RequestParam(required = false) String rangeEnd,
                                            @RequestParam(defaultValue = "0") int from,
-                                           @RequestParam(defaultValue = "10") int size) {
+                                           @RequestParam(defaultValue = "10") int size)
+    {
         log.info("get admin events");
 
         return eventService.getAdminEvents(

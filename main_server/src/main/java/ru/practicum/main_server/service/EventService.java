@@ -1,8 +1,6 @@
 package ru.practicum.main_server.service;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@EqualsAndHashCode
-@ToString
-@Transactional(readOnly = true)
+@Transactional
 @AllArgsConstructor
 public class EventService {
     public static final int MIN_HOURS = 2;
@@ -54,7 +50,7 @@ public class EventService {
         }
         LocalDateTime end;
         if (rangeEnd == null) {
-            end = LocalDateTime.MAX;
+            end = LocalDateTime.now().plusHours(MIN_HOURS);
         } else {
             end = LocalDateTime.parse(rangeEnd, DATE_TIME_FORMATTER);
         }
@@ -104,7 +100,7 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+
     public EventFullDto updateEvent(Long userId, UpdateEventRequest updateEventRequest) {
 
         Event event = checkAndGetEvent(updateEventRequest.getEventId());
@@ -149,7 +145,7 @@ public class EventService {
 
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        if (newEventDto.getAnnotation() == null || newEventDto.getDescription() == null){
+        if (newEventDto.getAnnotation() == null || newEventDto.getDescription() == null) {
             throw new RejectedRequestException("annotation or description cannot be null");
         }
         Location location = newEventDto.getLocation();
@@ -180,7 +176,7 @@ public class EventService {
         return setConfirmedRequestsAndViewsEventFullDto(eventMapper.toEventFullDto(event));
     }
 
-    @Transactional
+
     public EventFullDto cancelEvent(Long userId, Long eventId) {
         Event event = checkAndGetEvent(eventId);
         if (!event.getInitiator().getId().equals(userId)) {
@@ -195,7 +191,6 @@ public class EventService {
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
-
     public List<EventFullDto> getAdminEvents(List<Long> users, List<State> states, List<Long> categories,
                                              String rangeStart, String rangeEnd, int from, int size) {
         LocalDateTime start;
@@ -205,10 +200,10 @@ public class EventService {
             start = LocalDateTime.parse(rangeStart, DATE_TIME_FORMATTER);
         }
         LocalDateTime end;
-        if (rangeEnd == null) {
-            end = LocalDateTime.MAX;
-        } else {
+        if (rangeEnd != null) {
             end = LocalDateTime.parse(rangeEnd, DATE_TIME_FORMATTER);
+        } else {
+            end = LocalDateTime.now().plusHours(MIN_HOURS);
         }
 
         return eventRepository.searchEventsByAdmin(users, states, categories, start, end,
@@ -219,7 +214,6 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public EventFullDto updateEventByAdmin(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
         Event event = checkAndGetEvent(eventId);
 
@@ -263,7 +257,6 @@ public class EventService {
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
-    @Transactional
     public EventFullDto publishEventByAdmin(Long eventId) {
         Event event = checkAndGetEvent(eventId);
         if (event.getEventDate().isBefore(LocalDateTime.now().minusHours(MIN_HOURS))) {
@@ -278,7 +271,6 @@ public class EventService {
         return setConfirmedRequestsAndViewsEventFullDto(eventFullDto);
     }
 
-    @Transactional
     public EventFullDto rejectEventByAdmin(Long eventId) {
         Event event = checkAndGetEvent(eventId);
 
