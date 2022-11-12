@@ -13,6 +13,7 @@ import ru.practicum.main_server.model.User;
 import ru.practicum.main_server.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,9 +51,5 @@ public class UserService {
     public User checkAndGetUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new ObjectNotFoundException("user with id = " + userId + " not found"));
-    }
-
-    public User findById(Long id) {
-        return userRepository.findUserById(id);
     }
 }

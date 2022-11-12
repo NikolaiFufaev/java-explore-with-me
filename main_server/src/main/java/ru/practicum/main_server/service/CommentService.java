@@ -1,6 +1,7 @@
 package ru.practicum.main_server.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main_server.dto.CommentDto;
@@ -14,17 +15,17 @@ import ru.practicum.main_server.model.State;
 import ru.practicum.main_server.model.User;
 import ru.practicum.main_server.repository.CommentRepository;
 import ru.practicum.main_server.repository.EventRepository;
+import ru.practicum.main_server.repository.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @AllArgsConstructor
 public class CommentService {
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
@@ -34,21 +35,20 @@ public class CommentService {
         if (commentDto.getText().length() == 0 || commentDto.getText() == null) {
             throw new RejectedRequestException("Sorry comment null text");
         }
-        Event event = eventRepository.getReferenceById(eventId);
+        Event event = checkAndGetEvent(eventId);
         if (!event.getState().toString().equals(State.PUBLISHED.toString())) {
             throw new RejectedRequestException("Sorry you no Event no published");
         }
-        User user = userService.findById(userId);
+        User user = checkAndGetUser(userId);
         Comment comment = commentMapper.toComment(commentDto, user, event);
         return commentMapper.toCommentDto(commentRepository.save(comment));
     }
 
     public void deleteComment(Long userId, Long comId) {
-        Optional<Comment> byId = commentRepository.findById(comId);
-        if (byId.isEmpty()) {
-            throw new ObjectNotFoundException(String.format("Comment not found id=%s", comId));
-        }
-        if (!Objects.equals(byId.get().getAuthor().getId(), userId)) {
+        Comment comment = commentRepository.findById(comId)
+                .orElseThrow(() ->
+                        new ObjectNotFoundException(String.format("Comment not found id=%s", comId)));
+        if (!comment.getAuthor().getId().equals(userId)) {
             throw new RejectedRequestException("Sorry you no author comment");
         }
         commentRepository.deleteById(comId);
@@ -58,41 +58,50 @@ public class CommentService {
         if (updateComment.getId() == null) {
             throw new RejectedRequestException("Sorry comment null id");
         }
-        Optional<Comment> commentOptional = commentRepository.findById(updateComment.getId());
-        if (commentOptional.isEmpty()) {
-            throw new ObjectNotFoundException(String.format("Comment not found id=%s", updateComment.getId()));
-        }
+        Comment comment = commentRepository.findById(updateComment.getId())
+                .orElseThrow(() -> new ObjectNotFoundException(
+                        String.format("Comment not found id=%s", updateComment.getId())));
+        Event event = checkAndGetEvent(eventId);
         if (updateComment.getText().length() == 0 || updateComment.getText() == null) {
             throw new RejectedRequestException("Sorry comment null text");
         }
-        if (!eventRepository.findById(eventId).get().getState().equals(State.PUBLISHED)) {
+        if (!event.getState().equals(State.PUBLISHED)) {
             throw new RejectedRequestException("Sorry you no Event no published");
         }
-        if (!Objects.equals(commentOptional.get().getAuthor().getId(), userId)) {
+        if (!Objects.equals(comment.getAuthor().getId(), userId)) {
             throw new RejectedRequestException("Sorry you no author comment");
         }
-        Comment comment = commentOptional.get();
         commentMapper.updateCommentFromUpdateComment(updateComment, comment);
         return commentMapper.toCommentDto(commentRepository.save(comment));
     }
 
-    public List<CommentDto> getEventComments(long id) {
-        Optional<Event> event = eventRepository.findById(id);
-        return commentRepository.findAllByEventOrderByCreated(event.get())
+    public List<CommentDto> getEventComments(long id, int from, int size) {
+        Event event = checkAndGetEvent(id);
+        return commentRepository.findCommentsByEventOrderByCreated(event, PageRequest.of(from / size, size))
                 .stream()
                 .map(commentMapper::toCommentDto)
                 .collect(Collectors.toList());
 
     }
 
-    public List<CommentDto> getUserComments(long id) {
-        User user = userService.findById(id);
+    public List<CommentDto> getUserComments(long id, int from, int size) {
+        User user = checkAndGetUser(id);
 
-        return commentRepository.findCommentsByAuthorOrderByCreated(user)
+        return commentRepository.findCommentsByAuthorOrderByCreated(user, PageRequest.of(from / size, size))
                 .stream()
                 .map(commentMapper::toCommentDto)
                 .collect(Collectors.toList());
 
+    }
+
+    public Event checkAndGetEvent(long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() ->
+                new ObjectNotFoundException("event with id = " + eventId + " not found"));
+    }
+
+    public User checkAndGetUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new ObjectNotFoundException("user with id = " + userId + " not found"));
     }
 
 }
