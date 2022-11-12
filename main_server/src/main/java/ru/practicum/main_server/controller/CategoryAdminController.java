@@ -7,6 +7,7 @@ import ru.practicum.main_server.dto.NewCategoryDto;
 import ru.practicum.main_server.service.CategoryService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
 @RestController
 @RequestMapping(path = "/admin/categories")
@@ -32,7 +33,7 @@ public class CategoryAdminController {
     }
 
     @DeleteMapping("/{catId}")
-    public void deleteCategory(@PathVariable Long catId) {
+    public void deleteCategory(@Positive @PathVariable Long catId) {
         log.info("deleteCategory {}", catId);
         categoryService.deleteCategory(catId);
     }

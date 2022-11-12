@@ -17,6 +17,6 @@ public class UserShortDto {
     @NotNull
     private Long id;
     @NotNull
-    @Size(max = 255)
+    @Size(max = 50)
     private String name;
 }

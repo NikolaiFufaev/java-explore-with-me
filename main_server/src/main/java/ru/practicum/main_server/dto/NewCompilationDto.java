@@ -15,7 +15,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class NewCompilationDto {
 
-    @NotNull
     private Set<Long> events;
     @Size(max = 512)
     @NotNull

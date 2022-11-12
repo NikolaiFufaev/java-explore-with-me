@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Data
 @Builder
@@ -14,10 +13,12 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class NewUserRequest {
 
-    @NotEmpty
-    @Size(max = 255)
-    private String name;
-    @NotEmpty
+    @NotNull
     @Size(max = 50)
+    private String name;
+    @Email
+    @NotNull
+    @NotBlank
+    @Size(max = 255)
     private String email;
 }

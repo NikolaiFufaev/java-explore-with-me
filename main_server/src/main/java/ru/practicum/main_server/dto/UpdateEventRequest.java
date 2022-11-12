@@ -18,12 +18,12 @@ public class UpdateEventRequest {
     @NotNull
     private Long eventId;
     @NotNull
-    @Size(max = 1000)
+    @Size(min = 20, max = 2000)
     private String annotation;
     @NotNull
     private Long category;
     @NotEmpty
-    @Size(max = 1000)
+    @Size(min = 20, max = 7000)
     private String description;
     @NotNull
     @Size(max = 30)
@@ -32,6 +32,6 @@ public class UpdateEventRequest {
     private Boolean paid;
     private Integer participantLimit;
     @NotEmpty
-    @Size(max = 512)
+    @Size(min = 3, max = 120)
     private String title;
 }

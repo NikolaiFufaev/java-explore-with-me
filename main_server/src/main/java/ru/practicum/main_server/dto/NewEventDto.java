@@ -1,9 +1,7 @@
 package ru.practicum.main_server.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.main_server.model.Location;
 
 import javax.validation.constraints.NotNull;
@@ -13,26 +11,27 @@ import javax.validation.constraints.Size;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewEventDto {
 
     @NotNull
-    @Size(max = 1000)
-    private String annotation;
+    @Size(min = 20, max = 2000)
+    String annotation;
     @NotNull
-    private long category;
-    @Size(max = 1000)
-    private String description;
+    long category;
+    @Size(min = 20, max = 7000)
+    String description;
     @NotNull
     @Size(max = 30)
-    private String eventDate;
-    private Location location;
+    String eventDate;
     @NotNull
-    private boolean paid;
-    private int participantLimit;
-    private boolean requestModeration;
+    Location location;
+    boolean paid;
+    int participantLimit;
+    boolean requestModeration;
     @Size(max = 20)
-    private String state;
+    String state;
     @NotNull
-    @Size(max = 512)
-    private String title;
+    @Size(min = 3, max = 120)
+    String title;
 }

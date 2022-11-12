@@ -1,43 +1,45 @@
 package ru.practicum.main_server.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.main_server.model.Location;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventFullDto {
 
     @NotNull
-    private Long id;
+    Long id;
     @NotNull
-    private String annotation;
+    String annotation;
     @NotNull
-    private CategoryDto category;
-    private int confirmedRequests;
-    private String createdOn;
-    private String description;
+    CategoryDto category;
+    int confirmedRequests;
+    String createdOn;
+    String description;
     @NotNull
-    private String eventDate;
+    String eventDate;
     @NotNull
-    private UserShortDto initiator;
-    private Location location;
+    UserShortDto initiator;
+    Location location;
     @NotNull
-    private boolean paid;
-    private int participantLimit;
-    private String publishedOn;
-    private boolean requestModeration;
+    boolean paid;
+    int participantLimit;
+    String publishedOn;
+    boolean requestModeration;
     @Size(max = 20)
-    private String state;
+    String state;
     @NotNull
-    @Size(max = 512)
-    private String title;
-    private int views;
+    @Size(min = 3, max = 120)
+    String title;
+    int views;
+    List<CommentDto> comments;
 }

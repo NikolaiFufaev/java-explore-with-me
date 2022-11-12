@@ -1,6 +1,6 @@
 package ru.practicum.main_server.mapper;
 
-import lombok.experimental.UtilityClass;
+import org.springframework.stereotype.Component;
 import ru.practicum.main_server.dto.CompilationDto;
 import ru.practicum.main_server.dto.EventShortDto;
 import ru.practicum.main_server.dto.NewCompilationDto;
@@ -9,7 +9,7 @@ import ru.practicum.main_server.model.Compilation;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@UtilityClass
+@Component
 public class CompilationMapper {
     public static Compilation toCompilation(NewCompilationDto newCompilationDto) {
         return Compilation.builder()

@@ -1,33 +1,38 @@
 package ru.practicum.main_server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.main_server.dto.CommentDto;
 import ru.practicum.main_server.dto.ParticipationRequestDto;
+import ru.practicum.main_server.dto.UpdateComment;
 import ru.practicum.main_server.exception.ObjectNotFoundException;
+import ru.practicum.main_server.exception.RejectedRequestException;
 import ru.practicum.main_server.exception.WrongRequestException;
+import ru.practicum.main_server.mapper.CommentMapper;
 import ru.practicum.main_server.mapper.ParticipationMapper;
 import ru.practicum.main_server.model.*;
+import ru.practicum.main_server.repository.CommentRepository;
+import ru.practicum.main_server.repository.EventRepository;
 import ru.practicum.main_server.repository.ParticipationRepository;
-import ru.practicum.main_server.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class ParticipationService {
     private final ParticipationRepository participationRepository;
     private final UserService userService;
     private final EventService eventService;
+    private final EventRepository eventRepository;
+    private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
 
-    @Autowired
-    public ParticipationService(ParticipationRepository participationRepository, UserRepository userRepository, UserService userService, EventService eventService) {
-        this.participationRepository = participationRepository;
-        this.userService = userService;
-        this.eventService = eventService;
-    }
 
     public List<ParticipationRequestDto> getParticipationRequestsByUser(Long userId) {
         User requester = userService.checkAndGetUser(userId);
@@ -123,4 +128,5 @@ public class ParticipationService {
         participation.setStatus(StatusRequest.REJECTED);
         return ParticipationMapper.toParticipationRequestDto(participationRepository.save(participation));
     }
+
 }
