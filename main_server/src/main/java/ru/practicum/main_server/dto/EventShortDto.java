@@ -1,34 +1,36 @@
 package ru.practicum.main_server.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventShortDto {
 
     @NotNull
-    private Long id;
+    Long id;
     @NotNull
-    private String annotation;
+    String annotation;
     @NotNull
-    private CategoryDto category;
-    private int confirmedRequests;
+    CategoryDto category;
+    int confirmedRequests;
     @NotNull
-    private String eventDate;
+    String eventDate;
     @NotNull
-    private UserShortDto initiator;
+    UserShortDto initiator;
     @NotNull
-    private boolean paid;
+    boolean paid;
     @NotNull
     @Size(max = 512)
-    private String title;
-    private int views;
+    String title;
+    int views;
+    List<CommentDto> comments = new ArrayList<>();
 }

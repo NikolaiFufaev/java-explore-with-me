@@ -3,7 +3,7 @@ package ru.practicum.stats_server.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.stats_server.HitMapper;
+import ru.practicum.stats_server.mapper.HitMapper;
 import ru.practicum.stats_server.dto.EndpointHit;
 import ru.practicum.stats_server.dto.ViewStats;
 import ru.practicum.stats_server.model.HitModel;

@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.main_server.dto.CompilationDto;
 import ru.practicum.main_server.service.CompilationService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -20,14 +22,14 @@ public class CompilationPublicController {
 
     @GetMapping()
     public List<CompilationDto> getAllCompilations(@RequestParam(defaultValue = "false") Boolean pinned,
-                                                   @RequestParam(defaultValue = "0") int from,
-                                                   @RequestParam(defaultValue = "10") int size) {
+                                                   @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                                   @PositiveOrZero @RequestParam(defaultValue = "10") int size) {
         log.info("get compilations pinned {}", pinned);
         return compilationService.getCompilations(pinned, from, size);
     }
 
     @GetMapping("/{id}")
-    public CompilationDto getCompilationById(@PathVariable long id) {
+    public CompilationDto getCompilationById(@Positive  @PathVariable long id) {
         log.info("get compilation id={}", id);
         return compilationService.getCompilationById(id);
     }

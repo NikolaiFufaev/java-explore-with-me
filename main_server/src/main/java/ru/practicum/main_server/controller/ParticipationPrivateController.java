@@ -1,6 +1,7 @@
 package ru.practicum.main_server.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main_server.dto.ParticipationRequestDto;
 import ru.practicum.main_server.service.ParticipationService;
@@ -27,7 +28,7 @@ public class ParticipationPrivateController {
     @PostMapping
     public ParticipationRequestDto addParticipationRequest(
             @PathVariable Long userId,
-            @RequestParam Long eventId) {
+            @Validated @RequestParam Long eventId)  {
         log.info("add participation requests by userId{} eventId {}", userId, eventId);
         return participationService.createParticipationRequest(userId, eventId);
     }
