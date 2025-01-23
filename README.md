@@ -1,6 +1,3 @@
-# java-explore-with-me
-
-Pull request link: https://github.com/NikolaiFufaev/java-explore-with-me/pull/2
 
 ##### Комманды для запуска проекта в докере:
 - *mvn clean package*
